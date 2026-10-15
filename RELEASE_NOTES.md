@@ -1,7 +1,9 @@
-# SplitMind v1.1.3 beta — Appearance overlap fix
+# SplitMind v1.2 beta — premium interface refresh
 
-The screenshot showed the BDT badge painting above the open Appearance dropdown. The header previously shared stacking level 1 with the later main content. Its dropdown could not escape that parent stacking context, regardless of the dropdown's own z-index.
+Replaced the accumulated CSS revisions with a single design system. A narrower workspace, consistent blue accent, quieter background, restrained card shadows, consistent spacing and typography, segmented workflow tabs and compact footer make the interface easier to scan. Light and dark themes use the same layout and preserve readable text colors.
 
-The header now owns a separate sticky layer at z-index 100. Main and footer stay below it. The dropdown has an opaque background and its own layer inside the header, with stable button positioning and focus outlines. Clicking outside or pressing Escape closes it; using its controls keeps it open. All previous release changes and deployment instructions are included.
+Group cards have visible labels, optional payment details stay collapsed, and manual bill entry remains the primary action. Notes and bill photos remain secondary disclosures. Settlement cards emphasize payer, recipient and amount; payment methods and detailed balances remain expandable. The top-right Appearance dropdown stays above content. Mobile layouts stack cards and fields, wrap controls and simplify totals at narrow widths. Print styling strips navigation and actions.
 
-Build and automated checks pass, including layer rules and inside/outside closing behavior. Real browser visual testing was not available; verify the open dropdown on your phone and desktop after deploying. This ZIP updates the source package and has not itself been deployed.
+All previous calculations, multilingual manual descriptions, optional AI receipt reading, payment instructions, device drafts, export, sharing and manual records are preserved. Loading examples now asks for confirmation before replacing entered notes or bills. Unreadable API responses show a plain recovery message.
+
+Build and automated tests pass. Real Android/iPhone/desktop visual testing was not available in this environment. AI requires your server credentials and access code; payment instructions do not process or verify transfers. This source ZIP has not been deployed; upload its contents to your existing GitHub repository to update the connected Vercel deployment. See DEPLOYMENT_STEPS.md.
