@@ -1,0 +1,1 @@
+These React Bits component sources and styles were copied verbatim from the four implementation snippets supplied by the project owner. Source: https://reactbits.dev/ . PROVENANCE.json records the supplied-source SHA-256 digests. Integration and props are in ../effects.jsx.
