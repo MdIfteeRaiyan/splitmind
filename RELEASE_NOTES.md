@@ -1,9 +1,7 @@
-# SplitMind v1.1.2 beta — appearance at the top
+# SplitMind v1.1.3 beta — Appearance overlap fix
 
-Appearance now lives in a compact native dropdown at the top-right beside Help. Effects and theme buttons appear inside it without widening the header. Escape closes the dropdown. The footer keeps only About, How it works, Connected tools and Privacy.
+The screenshot showed the BDT badge painting above the open Appearance dropdown. The header previously shared stacking level 1 with the later main content. Its dropdown could not escape that parent stacking context, regardless of the dropdown's own z-index.
 
-Theme choice is remembered on this browser, with safe fallback if browser storage is blocked. Name fields have visible Person labels. The clickable logo now focuses the actual workspace heading. All v1.1.1 workflow navigation, compact footer, responsive layout, receipt compression and deployment configuration are included.
+The header now owns a separate sticky layer at z-index 100. Main and footer stay below it. The dropdown has an opaque background and its own layer inside the header, with stable button positioning and focus outlines. Clicking outside or pressing Escape closes it; using its controls keeps it open. All previous release changes and deployment instructions are included.
 
-Build and automated tests pass. Real-device visual testing remains outstanding; test the deployed site on your phone and desktop. External profile availability could not be confirmed from this environment. This ZIP has not been deployed: upload its source contents to your GitHub repository to update the connected Vercel deployment.
-
-See DEPLOYMENT_STEPS.md for complete GitHub and Vercel instructions.
+Build and automated checks pass, including layer rules and inside/outside closing behavior. Real browser visual testing was not available; verify the open dropdown on your phone and desktop after deploying. This ZIP updates the source package and has not itself been deployed.

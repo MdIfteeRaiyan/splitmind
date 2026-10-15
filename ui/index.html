@@ -118,6 +118,15 @@ section{padding-left:12px;padding-right:12px}.card,.workspace-inputs .card{paddi
 .appearance-panel button{width:100%;min-height:44px}.person-field-label{display:block;font-size:12px;color:var(--mut);margin-bottom:4px}.member-name{align-items:center}
 @media(max-width:420px){.nav .header-actions{gap:10px}.nav .header-appearance>summary{font-size:12px;padding:8px}.nav .logo{font-size:18px}.nav .header-help{font-size:13px}.electric-brand{margin-right:0;width:36px}.nav>div{gap:6px}}
 @media print{.header-actions{display:none!important}}
+
+/* Header owns the top UI layer: page badges must never cover its dropdown. */
+.nav{position:sticky;top:0;z-index:100;isolation:isolate;overflow:visible}
+main,.site-footer{position:relative;z-index:1}
+.nav .header-appearance{position:relative;z-index:2;flex:none}
+.nav .appearance-panel{z-index:3;background:var(--card);border-color:var(--line);box-shadow:0 16px 40px #0004;isolation:isolate}
+.nav .appearance-panel button{position:relative;display:flex;align-items:center;justify-content:flex-start;text-align:left;margin:0;transform:none}
+.nav .appearance-panel button:focus-visible{outline-offset:1px}
+@media(max-width:420px){.nav .appearance-panel{width:190px}}
 </style></head><body><div id="sceneEffect" aria-hidden="true"></div>
 <a class="skip-link" href="#demo">Skip to expense workspace</a>
 <nav class="nav" id="top" aria-label="Main navigation"><div><a class="logo" href="#demo"><span class="electric-brand" aria-hidden="true"><span class="brand-fallback">S</span><span id="logoEffect"></span></span>Split<span>Mind</span></a><span class="header-actions"><a class="header-help" href="#how">Help</a><details class="header-appearance" id="appearanceMenu"><summary>Appearance</summary><span class="appearance-panel"><button class="ghost sm" id="fxToggle" aria-pressed="true" aria-label="Toggle animated background and logo">Effects on</button><button class="ghost sm" id="theme" aria-label="Switch color theme">Theme</button></span></details></span></div></nav>
@@ -192,6 +201,7 @@ $('#readBill').onclick=async()=>{let generation,rev;try{if(billBusy)return;const
 function setTheme(theme,persist=false){document.documentElement.dataset.theme=theme;$('#theme').textContent=theme==='dark'?'Dark theme':'Light theme';$('#theme').setAttribute('aria-label',theme==='dark'?'Switch to light theme':'Switch to dark theme');if(persist)try{window.localStorage?.setItem('splitmind.theme',theme)}catch{}}
 try{const saved=window.localStorage?.getItem('splitmind.theme');if(saved==='dark'||saved==='light')setTheme(saved)}catch{}
 $('#theme').onclick=()=>{const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);setTheme(dark?'light':'dark',true)};
+document.addEventListener('pointerdown',e=>{const menu=$('#appearanceMenu');if(menu.open&&menu.contains&&!menu.contains(e.target))menu.open=false});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#appearanceMenu').open){$('#appearanceMenu').open=false;$('#appearanceMenu').querySelector?.('summary')?.focus?.()}});
 
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
