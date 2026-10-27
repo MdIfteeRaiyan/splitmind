@@ -18,10 +18,10 @@ Requires Node.js 22+.
 ## Features
 
 - Four clickable, keyboard-accessible steps: Group, Expenses, Review, Settle. Group names and bill amounts are validated before advancing.
-- Manual descriptions in any language; local automatic note recognition for supported English/Banglish patterns.
+- Manual descriptions in any language; local automatic note recognition for limited English/Banglish patterns and Bengali numerals. Unrecognized portions are flagged for review.
 - JPEG, PNG and WebP bill-photo previews, up to 3 MB. Optional configured AI reading requires review. PDF/HEIC inputs are not supported.
-- Integer-poisha equal sharing with deterministic remainder allocation. Exact minimum-transfer optimization up to 12 nonzero balances, labeled greedy fallback above that.
-- Optional browser-local draft save/restore/delete, print, CSV/JSON export and copy/share summary.
+- Integer-poisha equal sharing with deterministic remainder allocation or custom per-person amounts that sum to the total. Exact minimum-transfer optimization up to 12 nonzero balances, labeled greedy fallback above that.
+- Optional browser-local draft save/restore/delete, print, CSV/JSON export and copy/share summary. Manual partial repayments update the plan and may be saved locally; they are not provider verified.
 - Payment-method labels: bKash, Nagad, Rocket, Upay, bank transfer, card, cash, cryptocurrency and other/custom wallets. These are manual guidance and records, not payment integrations.
 
 ## Payment limits
@@ -34,7 +34,7 @@ Set `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-4.1-mini`) and `DEMO_ACCESS_C
 
 ## Privacy and local drafts
 
-Unsaved entries live in memory. Opt-in saving stores one draft in this browser: names, optional wallet numbers, notes and ledger. Restoring starts at Review; payment records, images, access codes and provider tokens are excluded. Pause saving keeps the last copy; Delete removes it without clearing the open workspace. Shared-device users should avoid saving sensitive details. AI receives selected notes/photos and names only after an explicit AI action. Share summary excludes wallet numbers and credentials. No cloud login/sync or analytics is implemented.
+Unsaved entries live in memory. Opt-in saving stores one draft in this browser: names, optional wallet numbers, notes and ledger. Restoring starts at Review; full-payment marks, images, access codes and provider tokens are excluded; manual partial-payment adjustments are included in the saved ledger. Pause saving keeps the last copy; Delete removes it without clearing the open workspace. Shared-device users should avoid saving sensitive details. AI receives selected notes/photos and names only after an explicit AI action. Share summary excludes wallet numbers and credentials. No cloud login/sync or analytics is implemented.
 
 ## Architecture and visual components
 

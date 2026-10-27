@@ -1,7 +1,7 @@
 export function calculate(members,data){
  const cents=Object.fromEntries(members.map(m=>[m.name,0])),pair=new Map();let total=0;
  const add=(a,b,v)=>{if(a===b)return;const k=JSON.stringify([a,b].sort());pair.set(k,(pair.get(k)||0)+(a<b?v:-v))};
- data.expenses.forEach(e=>{const amount=Math.round(e.amount*100),base=Math.floor(amount/e.participants.length),remainder=amount%e.participants.length;total+=amount;cents[e.payer]+=amount;e.participants.forEach((n,i)=>{const share=base+(i<remainder?1:0);cents[n]-=share;add(n,e.payer,share)})});
+ data.expenses.forEach(e=>{const amount=Math.round(e.amount*100),base=Math.floor(amount/e.participants.length),remainder=amount%e.participants.length,custom=e.shares;if(custom!==undefined&&(!Array.isArray(custom)||custom.length!==e.participants.length||custom.some(v=>typeof v!=='number'||!Number.isFinite(v)||v<0||Math.abs(v*100-Math.round(v*100))>0.000001)||custom.reduce((sum,v)=>sum+Math.round(v*100),0)!==amount))throw Error('Custom shares must match the bill total.');total+=amount;cents[e.payer]+=amount;e.participants.forEach((n,i)=>{const share=custom===undefined?base+(i<remainder?1:0):Math.round(custom[i]*100);cents[n]-=share;add(n,e.payer,share)})});
  data.debts.forEach(d=>{const amount=Math.round(d.amount*100);cents[d.from]-=amount;cents[d.to]+=amount;add(d.from,d.to,amount)});
  const optimized=optimizeBalances(cents);
  return{bal:Object.fromEntries(Object.entries(cents).map(([n,v])=>[n,v/100])),tx:optimized.tx,exact:optimized.exact,naive:[...pair.values()].filter(v=>v!==0).length,total:total/100};

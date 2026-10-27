@@ -1,6 +1,6 @@
 # SplitMind — GitHub and Vercel deployment
 
-This ZIP contains the complete source for SplitMind v1.1 beta, including its Vercel server adapter, build configuration, tests and MIT license. No GitHub repository or Vercel deployment has been created by this package. You will sign in to your own accounts to publish it.
+This ZIP contains the complete source for SplitMind v1.6 beta, including its Vercel server adapter, build configuration, tests and MIT license. No GitHub repository or Vercel deployment has been created by this package. You will sign in to your own accounts to publish it.
 
 ## 1. Extract the ZIP
 
