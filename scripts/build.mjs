@@ -8,3 +8,4 @@ await rm('dist',{recursive:true,force:true});await mkdir('dist/server',{recursiv
 
 for(const name of ['favicon.svg','404.html'])await writeFile('public/'+name,await readFile('ui/'+name));
 
+

@@ -1,11 +1,11 @@
 {
   "name": "splitmind",
-  "version": "1.6.0-beta.1",
+  "version": "2.0.0-beta.1",
   "private": true,
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs && npm test",
     "start": "node --env-file-if-exists=.env scripts/dev.mjs",
     "test": "node --test tests/*.test.mjs"
   },

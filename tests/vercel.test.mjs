@@ -5,7 +5,7 @@ import adapter from '../api/index.js';
 test('Vercel adapter routes config, rejects retired endpoints, and preserves origin checks', async () => {
   const config = await adapter.fetch(new Request('https://splitmind.test/api?route=config'));
   assert.equal(config.status, 200);
-  assert.deepEqual(Object.keys(await config.json()), ['aiReady']);
+  assert.deepEqual(await config.json(), {aiReady:false,visionReady:false,mode:'free-local',localOCR:true,accessRequired:false,quotaProtection:'instance'});
   const missing = await adapter.fetch(new Request('https://splitmind.test/api?route=orders'));
   assert.equal(missing.status, 404);
   const forbidden = await adapter.fetch(new Request('https://splitmind.test/api?route=plan', {

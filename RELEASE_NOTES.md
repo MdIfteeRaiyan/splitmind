@@ -1,3 +1,29 @@
+# v2.0 beta — AI review and shared snapshots
+
+Optional server-side Gemini chat/receipt extraction, Groq text fallback on temporary provider errors, per-instance limits and optional atomic Redis limits. Receipt items/VAT/service charges are shown separately for review; only the final total enters the ledger. Shared URL snapshots contain names/amounts and isolated local marks, not live sync. Added exact per-person balance explanations, AI rewrites and local/AI reminder drafts in English/Bangla/Banglish. All core tools remain free and available with no provider key. No provider success, receipt accuracy or real-user study is claimed without measurement.
+
+# v1.9.1 — Free external payment handoff
+
+Compact payment method selection, copy combined recipient/amount instructions, nearby clipboard fallback, missing recipient-details shortcut and external-link feedback. No invented app deep links, cloud payment processing, auto-prefilled personal transfers or transaction verification. Numeric/local address URLs are rejected.
+
+# v1.9.0 — Simplified settlement workspace
+
+Dinner and trip demos share one Try an example dropdown. Step 4 now uses a full-width settlement workspace, grouped overview metrics, responsive payment cards, a static Share plan button and collapsed balances/print/export tools. All accounting, manual repayments and free tools remain. Still to record refers to manual marks, not bank-confirmed outstanding money.
+
+# v1.8.1 — Simpler visual controls
+
+Removed the top event acknowledgment, glowing ElectricLogo and StarBorder button decoration. The header uses the static S favicon. Empty/duplicate group-name warnings open an accessible dialog and focus the affected field when dismissed. Free OCR, percentages, backups and settlement tools remain.
+
+# v1.8.0 — Combined free release
+
+Added portable backup download/import, percentage-to-custom splitting with exact poisha rounding, a phone-camera receipt input and collapsible recognized receipt text. Imports require confirmation, preserve partial repayments and do not restore verification. Existing features remain free. Official sticker artwork remains pending.
+
+# v1.7.0 — Free edition
+
+Removed cloud LLM calls and access codes. Added local receipt OCR with explicit BDT confirmation, four language choices, download/error fallback, and improved name whitespace handling. Existing splits, repayments, export and saving remain. See FREE_EDITION.md for scope and verification limits.
+
+## Historical releases
+
 # SplitMind v1.6 beta — fit and mobile navigation
 
 Corrected the decorative StarBorder canvas width so its trail fits the button instead of being displaced. A small mobile menu opens the existing help, about, tools and privacy sections; the desktop header remains compact. User-provided phone-shaped mobile-wallet numbers open the phone dialer and email-shaped other-wallet references open the email app. SplitMind still does not initiate payments; bank and cryptocurrency references are not treated as phone numbers. No public contact details were invented.

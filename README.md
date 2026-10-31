@@ -1,55 +1,31 @@
-# Start here
+# SplitMind v2 beta — Free core, optional AI
 
-Read **DEPLOYMENT_STEPS.md** for numbered GitHub → Vercel instructions.
+Optional server-side Gemini/Groq integration, receipt vision, shared URL snapshots, exact balance explanations and multilingual reminder drafts are documented in AI_SETUP.md and BUILDATHON_READINESS.md. AI is off by default and needs an owner-configured provider key. Core local features remain free.
 
-# SplitMind
+# SplitMind — free edition
 
-A small shared-expense calculator for friends, families and trips. Add people, enter bills, review the split and share who pays whom.
+A BDT shared-expense web app by Md. Iftee Raiyan. No account, API key, access code or paid AI service is required.
 
-## Run locally
-
-Requires Node.js 22+.
-
-1. Run `npm ci`.
-2. Copy `.env.example` to `.env`; AI fields may stay blank for manual use.
-3. Run `npm start`, then open http://localhost:3000.
-4. Run `npm run build` before `npm test`.
+## Run
+Node 22: `npm ci`, then `npm start`. Open http://localhost:3000. `npm run build` creates the deployable page and runs the automated checks. MIT license.
 
 ## Features
+- Four guided steps: group, expenses, review, settle.
+- Manual descriptions in any language; limited English/Banglish rule-based note parsing with Bengali digits. This is not generative AI or universal language understanding.
+- Equal/custom shares, a percentage calculator that converts to exact BDT shares, multiple payers, existing debts, integer-poisha accounting, minimized settlement transfers (exact for up to 12 nonzero balances, greedy thereafter).
+- Free browser receipt OCR, editable text and final total, explicit BDT confirmation before adding a bill. JPEG/PNG/WebP up to 3 MB; no PDF/HEIC.
+- OCR languages: English, Bangla+English, Hindi+English, Arabic+English. Accuracy is not guaranteed or proven on local receipts. Handwriting and blurry receipts may need manual entry.
+- Portable JSON backup download/import (including partial repayments), phone-camera receipt input on supported devices, partial manual repayments, full-payment marks, copy/share/WhatsApp, JSON/CSV export, print, local draft save/restore, light/dark mode and optional effects.
+- Recipient-owned HTTPS payment links/QR and reference copying. No direct money transfers or provider verification.
 
-- Four clickable, keyboard-accessible steps: Group, Expenses, Review, Settle. Group names and bill amounts are validated before advancing.
-- Manual descriptions in any language; local automatic note recognition for limited English/Banglish patterns and Bengali numerals. Unrecognized portions are flagged for review.
-- JPEG, PNG and WebP bill-photo previews, up to 3 MB. Optional configured AI reading requires review. PDF/HEIC inputs are not supported.
-- Integer-poisha equal sharing with deterministic remainder allocation or custom per-person amounts that sum to the total. Exact minimum-transfer optimization up to 12 nonzero balances, labeled greedy fallback above that.
-- Optional browser-local draft save/restore/delete, print, CSV/JSON export and copy/share summary. Manual partial repayments update the plan and may be saved locally; they are not provider verified.
-- Payment-method labels: bKash, Nagad, Rocket, Upay, bank transfer, card, cash, cryptocurrency and other/custom wallets. These are manual guidance and records, not payment integrations.
+## Privacy and downloads
+Bills and photos are processed in the browser. Receipt scanning lazily loads Tesseract.js 6.0.1 from jsDelivr; its worker/core and language models require internet. It can take time or fail on low-memory phones; manual entry always remains available. Download hosts see ordinary download requests, not receipt uploads by SplitMind. There is no cloud account or group synchronization. Optional saving uses localStorage; photos and full-payment marks are session-only. Sharing/export deliberately sends the selected content outside the app.
 
-## Payment limits
+## Free scope
+Core mode makes no AI provider calls. Optional AI uses the provider/account tier configured by the owner. `/api/parse` is opt-in and ignores legacy OpenAI keys. `/api/config` reports AI/vision availability without secrets. Static hosting can use a provider's free plan subject to its terms, quotas and network/data costs. No unlimited hosting or perpetual third-party availability is promised.
 
-SplitMind does not send, receive or hold funds. All actual payments happen outside the site. Ledger values are BDT; no crypto pricing, exchange-rate conversion, card collection or blockchain execution is provided. A recorded payment is the user's own record, not provider verification. Legacy order/capture endpoints are removed and return 404.
+## Build and tests
+UI/engine/OCR workflow tests include mocks of OCR; they do not prove real image recognition accuracy. Build runs the full test suite. Test real receipts and phones before reporting accuracy or user outcomes. See FREE_EDITION.md, TRIP_DEMO.md and BUILDATHON_READINESS.md.
 
-## Optional AI
-
-Set `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-4.1-mini`) and `DEMO_ACCESS_CODE` on the server. Users enter the access code under Footer → Tools → Access code. `/api/parse` uses schema-constrained multilingual note/image extraction; it must never invent payer/participants for receipts. Ambiguous totals and explicit non-BDT currency need review. Provider results are not automatically accepted. `PORT` controls the local server.
-
-## Privacy and local drafts
-
-Unsaved entries live in memory. Opt-in saving stores one draft in this browser: names, optional wallet numbers, notes and ledger. Restoring starts at Review; full-payment marks, images, access codes and provider tokens are excluded; manual partial-payment adjustments are included in the saved ledger. Pause saving keeps the last copy; Delete removes it without clearing the open workspace. Shared-device users should avoid saving sensitive details. AI receives selected notes/photos and names only after an explicit AI action. Share summary excludes wallet numbers and credentials. No cloud login/sync or analytics is implemented.
-
-## Architecture and visual components
-
-`ui/index.html` owns the workspace. `ui/effects.jsx` integrates the supplied SlingButton, ElectricLogo, HoldButton and SideRays components in `ui/components/`. React/Motion/OGL/Hugeicons are bundled locally with esbuild into the served page. The logo uses one slot and a static fallback; SideRays is the gold-and-blue full-viewport background. Effects can be disabled and respect reduced motion. Sources and provenance hashes are retained.
-
-`worker/index.js` serves the page, optional AI API and server-side ledger calculation. `worker/engine.mjs` owns integer accounting. Vercel configuration is in `vercel.json`; `api/index.js` adapts the API to Vercel. Build produces `public/index.html` and a local test bundle at `dist/server/index.js`.
-
-## Verification limits
-
-Automated tests cover accounting, review/navigation, storage recovery, sharing, uploads, validation and mocked AI. Real provider extraction and mobile/desktop graphics/browser QA remain pending. The public audience has not been changed.
-
-MIT license for project code; supplied component attribution is retained in `ui/components/README.md`.
-
-## Creator and recipient payment links
-
-Built by **Md. Iftee Raiyan**. GitHub: https://github.com/MdIfteeRaiyan/ · LinkedIn: https://www.linkedin.com/in/md-iftee-raiyan-b20336386/ . Footer navigation uses one set of expandable sections; the creator block lives inside About.
-
-Each person can optionally provide separate account details, an HTTPS payment link and a provider-generated QR image for each method. These are recipient-supplied destinations, not provider-verified integrations. SplitMind shows the destination host and BDT amount for confirmation, does not append invented amount parameters and never marks a link click/QR view as payment. Invalid/non-HTTPS links cannot be opened. QR uploads accept JPEG/PNG/WebP up to 1 MB and 12 megapixels; photos remain in memory and are excluded from saved drafts. Account details and links save only with explicit device-saving consent. Existing drafts without these fields remain compatible. Copy controls are available for the amount and recipient details.
+## Third-party notices
+Tesseract.js is Apache-2.0: https://github.com/naptha/tesseract.js . It wraps the Tesseract OCR engine and neural-network language models. Model assets are fetched by the library. Existing React visual components and provenance files remain in ui/components. No cloud LLM is used; do not describe local note rules as AI.

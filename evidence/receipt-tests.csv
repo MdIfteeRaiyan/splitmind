@@ -1,0 +1,11 @@
+case_id,language,receipt_type,human_total_bdt,ai_total_bdt,total_exact_match,items_checked,tax_checked,uncertainty_returned,manual_correction,latency_seconds,notes
+R01,,,,,,,,,,,
+R02,,,,,,,,,,,
+R03,,,,,,,,,,,
+R04,,,,,,,,,,,
+R05,,,,,,,,,,,
+R06,,,,,,,,,,,
+R07,,,,,,,,,,,
+R08,,,,,,,,,,,
+R09,,,,,,,,,,,
+R10,,,,,,,,,,,
