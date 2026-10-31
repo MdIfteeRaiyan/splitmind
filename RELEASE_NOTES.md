@@ -1,3 +1,7 @@
+# v2 beta.2 — Vercel build fix
+
+Adapter tests now isolate and restore their AI environment fixtures. Builds no longer assume production AI is disabled. Added adapter tests for Gemini enabled, text-only Groq and durable quota configuration. Production Gemini variables remain enabled and are not changed by deployment.
+
 # v2.0 beta — AI review and shared snapshots
 
 Optional server-side Gemini chat/receipt extraction, Groq text fallback on temporary provider errors, per-instance limits and optional atomic Redis limits. Receipt items/VAT/service charges are shown separately for review; only the final total enters the ledger. Shared URL snapshots contain names/amounts and isolated local marks, not live sync. Added exact per-person balance explanations, AI rewrites and local/AI reminder drafts in English/Bangla/Banglish. All core tools remain free and available with no provider key. No provider success, receipt accuracy or real-user study is claimed without measurement.
