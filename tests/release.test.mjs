@@ -9,3 +9,5 @@ test('built internal links resolve and all packaged pages have metadata',async()
  await access('public/favicon.svg');assert(!html.includes('placeholder='));
  const missing=await readFile('public/404.html','utf8');assert(missing.includes('href="/"'));assert(missing.includes('noindex'));
 });
+
+test('browser favicon and visible brand use the same versioned green S asset',async()=>{assert(html.includes('rel="icon" type="image/svg+xml" href="/favicon.svg?v=green-s-2"'));assert(html.includes('class="brand-mark" src="/favicon.svg?v=green-s-2"'));const icon=await readFile('public/favicon.svg','utf8');assert(icon.includes('#0b5d46'));});
