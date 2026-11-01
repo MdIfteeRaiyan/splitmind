@@ -1,3 +1,11 @@
+# v2 beta.9 — centered popups and quieter notes
+
+Centered validation and first-visit panels without modal input locking. Removed the repeated notes examples; kept the homepage picker. Reduced nearby copy and moved detailed limitations/privacy into a disclosure. Normalized Gemini model IDs and clarified HTTP 404 resolution. Live project model access still needs validation by its owner.
+
+# v2 beta.8 — first-visit guide and premium settlement
+
+Removed the two in-flow help panels. Added dismissible, non-modal first-visit help remembered on the current browser, plus a compact per-step Quick guide. Settlement now emphasizes remaining BDT, manual recording progress, group context, numbered transfer cards and clear payment routes. Payment records remain manual; shared snapshots do not sync.
+
 # v2 beta.7 — descriptive AI errors and non-blocking popups
 
 Retain safe provider HTTP diagnostics after fallback, show actionable non-modal error popups for notes, receipt, review, payment and backup errors, and reject empty notes before calling AI. Configured-key wording no longer claims a verified AI connection. API secrets and raw provider responses are never displayed.

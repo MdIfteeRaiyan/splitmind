@@ -31,3 +31,6 @@ https://upstash.com/docs/redis/features/restapi
 
 ## When a configured key still fails
 Configuration presence is not a successful live request. Popups now preserve a safe provider name and HTTP reason: 400 key/request/project requirements, 403 permissions, 404 model access, 429 quota, 5xx provider availability, or timeout/connection failure. Check the corresponding project in AI Studio and redeploy after changing server variables. Raw provider messages, API keys and billing identifiers are never sent to users. Manual entry/local notes/OCR remain available.
+
+## HTTP 404: model not found
+The variable name alone does not show its value. Check GEMINI_MODEL in Vercel: use the exact model ID supported by your API project, not a display name, a URL, or a retired preview ID. Whitespace and a leading models/ prefix are now normalized. Google documents listing models and filtering supportedGenerationMethods for generateContent at https://ai.google.dev/api/models . Availability does not by itself guarantee structured-output/vision support or a free quota; confirm the selected model in AI Studio. Redeploy after editing the variable. Do not share the API key.
