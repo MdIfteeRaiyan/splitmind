@@ -1,3 +1,7 @@
+# v2 beta.11 — compact transfers and restrained motion
+
+Reorganized transfer cards around full From/To identities and an adjacent amount on desktop, stacking cleanly on phones. Added short view transitions, popup/content fades, control feedback and a payment-record highlight, with keyboard focus restored after recording. Motion can be disabled in Appearance, persists on the browser and respects reduced-motion settings. No AI provider or accounting changes.
+
 # v2 beta.10 — Gemini 3.x request compatibility
 
 Use the modern model default and omit legacy thinkingBudget:0 and temperature overrides for newer Gemini models. Preserve explicit 2.5 Flash compatibility. Tests inspect the outbound request body for each model family. Live provider success still requires the deployment owner’s configured project and quota.

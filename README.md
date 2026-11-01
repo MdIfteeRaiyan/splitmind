@@ -1,34 +1,61 @@
-# SplitMind v2 beta — Free core, optional AI
+# SplitMind
 
-Optional server-side Gemini/Groq integration, receipt vision, shared URL snapshots, exact balance explanations and multilingual reminder drafts are documented in AI_SETUP.md and BUILDATHON_READINESS.md. AI is off by default and needs an owner-configured provider key. Core local features remain free.
+Shared bills are easy to lose track of after a dinner or a trip. SplitMind turns them into a clear plan for who pays whom, in Bangladeshi taka.
 
-# SplitMind — free edition
+Built by **Md. Iftee Raiyan** · [Live app](https://splitmind-bd.vercel.app/) · [GitHub](https://github.com/MdIfteeRaiyan/)
 
-A BDT shared-expense web app by Md. Iftee Raiyan. No account, API key, access code or paid AI service is required.
+## Try it
 
-## Run
-Node 22: `npm ci`, then `npm start`. Open http://localhost:3000. `npm run build` creates the deployable page and runs the automated checks. MIT license.
+Add your group, enter expenses, check the bills, then open the settlement plan. The dinner and trip examples let you explore without entering your own data.
 
-## Features
-- Four guided steps: group, expenses, review, settle.
-- Manual descriptions in any language; limited English/Banglish rule-based note parsing with Bengali digits. This is not generative AI or universal language understanding.
-- Equal/custom shares, a percentage calculator that converts to exact BDT shares, multiple payers, existing debts, integer-poisha accounting, minimized settlement transfers (exact for up to 12 nonzero balances, greedy thereafter).
-- Free browser receipt OCR, editable text and final total, explicit BDT confirmation before adding a bill. JPEG/PNG/WebP up to 3 MB; no PDF/HEIC.
-- OCR languages: English, Bangla+English, Hindi+English, Arabic+English. Accuracy is not guaranteed or proven on local receipts. Handwriting and blurry receipts may need manual entry.
-- Portable JSON backup download/import (including partial repayments), phone-camera receipt input on supported devices, partial manual repayments, full-payment marks, copy/share/WhatsApp, JSON/CSV export, print, local draft save/restore, light/dark mode and an optional lightweight static background.
-- Recipient-owned HTTPS payment links/QR and reference copying. No direct money transfers or provider verification.
+You can enter bills manually, paste English or Banglish notes, or upload a receipt. When enabled by the host, Gemini can extract expenses from text and read receipt images. Every result is reviewed before it affects the plan.
 
-## Privacy and downloads
-Bills and photos are processed in the browser. Receipt scanning lazily loads Tesseract.js 6.0.1 from jsDelivr; its worker/core and language models require internet. It can take time or fail on low-memory phones; manual entry always remains available. Download hosts see ordinary download requests, not receipt uploads by SplitMind. There is no cloud account or group synchronization. Optional saving uses localStorage; photos and full-payment marks are session-only. Sharing/export deliberately sends the selected content outside the app.
+## What it does
 
-## Free scope
-Core mode makes no AI provider calls. Optional AI uses the provider/account tier configured by the owner. `/api/parse` is opt-in and ignores legacy OpenAI keys. `/api/config` reports AI/vision availability without secrets. Static hosting can use a provider's free plan subject to its terms, quotas and network/data costs. No unlimited hosting or perpetual third-party availability is promised.
+- Equal or custom splits, including a percentage helper.
+- Different payers, previous debts and partial repayments.
+- Calculations in integer poisha to avoid floating-point rounding errors.
+- A settlement plan with the fewest transfers for up to 12 nonzero balances; a greedy plan for larger groups.
+- Local receipt OCR with editable totals, plus optional Gemini vision.
+- Balance explanations and editable English, Bangla or Banglish reminders.
+- Shareable plan snapshots, print, CSV/JSON reports and restorable backups.
+- Optional device saving and light/dark themes.
 
-## Build and tests
-UI/engine/OCR workflow tests include mocks of OCR; they do not prove real image recognition accuracy. Build runs the full test suite. Test real receipts and phones before reporting accuracy or user outcomes. See FREE_EDITION.md, TRIP_DEMO.md and BUILDATHON_READINESS.md.
+Payments happen outside SplitMind. Recipient-provided links, QR codes and copied details help with payment handoff; a manual payment mark is never bank confirmation. All calculations use BDT.
 
-## Third-party notices
-Tesseract.js is Apache-2.0: https://github.com/naptha/tesseract.js . It wraps the Tesseract OCR engine and neural-network language models. Model assets are fetched by the library. Existing React visual components and provenance files remain in ui/components. The core needs no cloud model. Optional server-side Gemini/Groq is available when configured; do not describe local note rules as generative AI.
+## Run locally
 
-## Reliability release (beta.3)
-The live page and build use plain HTML/CSS/JavaScript and Node built-ins, with no third-party build packages or WebGL rendering. Archived visual source is retained for provenance, but is not bundled or executed. The optional OCR library downloads only when requested. Startup errors show a recovery message; reload does not erase the saved device draft. See BUILDATHON_READINESS.md for uncompleted real-world validation and sticker requirements.
+Requires Node.js 22.
+
+```sh
+npm ci
+npm start
+```
+
+Open http://localhost:3000. To check the release:
+
+```sh
+npm run build
+```
+
+The build generates `public/` for Vercel and runs the full test suite. No third-party build packages are needed. OCR downloads Tesseract.js only when requested.
+
+## Deploy
+
+Use [DEPLOYMENT_STEPS.md](DEPLOYMENT_STEPS.md). Existing Vercel Gemini settings should be preserved. For a new local setup, copy `.env.example` to `.env` and follow [AI_SETUP.md](AI_SETUP.md). Keep provider keys on the server.
+
+## Privacy and limits
+
+Manual entry and local note parsing run in the browser. Local notes use limited rules, not a language model. OCR loads third-party code and language data; the receipt image stays on the device unless you choose vision AI. AI sends the selected content to the configured provider.
+
+Device saving is optional. Backups can include wallet details. Shared links contain names and amounts readable by anyone with the link; they are snapshots, not synchronized groups. Full-payment marks and photos are not saved.
+
+Core tools need no paid AI subscription. Provider quotas, availability and data terms apply to optional AI. For a broad public launch, configure shared rate limits as described in AI_SETUP.md. Default in-memory limits apply only within one server instance.
+
+Automated tests cover accounting and workflows, including mocked AI/OCR responses. They do not establish receipt accuracy or usability on real phones. See [BUILDATHON_READINESS.md](BUILDATHON_READINESS.md) for the remaining field checks.
+
+## Source and license
+
+`ui/` contains the page and assets, `worker/` the API and calculation engine, `api/` the Vercel adapter, and `tests/` the checks. Older visual components are retained in `ui/components/` with provenance notices; they are not executed by the app.
+
+MIT licensed. Tesseract.js is Apache-2.0 licensed: https://github.com/naptha/tesseract.js.
