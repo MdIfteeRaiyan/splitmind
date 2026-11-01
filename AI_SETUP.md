@@ -28,3 +28,6 @@ https://ai.google.dev/gemini-api/docs/billing
 https://ai.google.dev/gemini-api/docs/generate-content/structured-output
 https://console.groq.com/docs/structured-outputs
 https://upstash.com/docs/redis/features/restapi
+
+## When a configured key still fails
+Configuration presence is not a successful live request. Popups now preserve a safe provider name and HTTP reason: 400 key/request/project requirements, 403 permissions, 404 model access, 429 quota, 5xx provider availability, or timeout/connection failure. Check the corresponding project in AI Studio and redeploy after changing server variables. Raw provider messages, API keys and billing identifiers are never sent to users. Manual entry/local notes/OCR remain available.

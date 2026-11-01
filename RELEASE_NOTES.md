@@ -1,3 +1,7 @@
+# v2 beta.7 — descriptive AI errors and non-blocking popups
+
+Retain safe provider HTTP diagnostics after fallback, show actionable non-modal error popups for notes, receipt, review, payment and backup errors, and reject empty notes before calling AI. Configured-key wording no longer claims a verified AI connection. API secrets and raw provider responses are never displayed.
+
 # v2 beta.6 — verified click routing regression
 
 The document root carries data-step for styling. The old delegated click handler matched that root for ordinary input clicks, navigating back to the current step and stealing focus. Restricting the selector to button[data-step] fixes the cause. A regression with ancestor matching fails on the old selector (five unintended navigations) and passes on the fix.
