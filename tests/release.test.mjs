@@ -11,3 +11,5 @@ test('built internal links resolve and all packaged pages have metadata',async()
 });
 
 test('browser favicon and visible brand use the same versioned green S asset',async()=>{assert(html.includes('rel="icon" type="image/svg+xml" href="/favicon.svg?v=green-s-2"'));assert(html.includes('class="brand-mark" src="/favicon.svg?v=green-s-2"'));const icon=await readFile('public/favicon.svg','utf8');assert(icon.includes('#0b5d46'));});
+
+test('mobile steps keep full labels intact and stack counters above them',()=>{assert(html.includes('.flow-steps button{white-space:nowrap;overflow-wrap:normal;word-break:normal}'));assert(html.includes('.flow-steps button{flex-direction:column;gap:5px;'));assert(html.includes('>2</span>Expenses</button>'));});
