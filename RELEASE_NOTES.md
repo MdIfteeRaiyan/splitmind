@@ -1,3 +1,7 @@
+# v2 beta.5 — input stability
+
+Name and note typing no longer changes wizard visibility on every keystroke. Group validation uses a dismissible non-modal popup, never browser page-wide inertness, and clears when a name is corrected. Regression checks cover continuous English/Bangla typing and typing after invalid submission. Browser interaction still requires verification.
+
 # v2 beta.4 — section guidance and control refinement
 
 Added concise expandable guidance to all four steps, a live bill-review summary, descriptive control titles, consistent touch targets, destructive-action styling and narrower-phone action layouts. Clarified saved-copy deletion and backup/report differences. Core accounting and optional AI behavior are unchanged.
