@@ -1,6 +1,6 @@
 {
   "name": "splitmind",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -12,15 +12,6 @@
   "engines": {
     "node": "22.x"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "motion": "^12.0.0",
-    "ogl": "^1.0.11",
-    "@hugeicons/react": "^1.1.10",
-    "@hugeicons/core-free-icons": "^3.0.0"
-  },
-  "devDependencies": {
-    "esbuild": "^0.25.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

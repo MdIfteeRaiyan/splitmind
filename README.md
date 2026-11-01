@@ -15,7 +15,7 @@ Node 22: `npm ci`, then `npm start`. Open http://localhost:3000. `npm run build`
 - Equal/custom shares, a percentage calculator that converts to exact BDT shares, multiple payers, existing debts, integer-poisha accounting, minimized settlement transfers (exact for up to 12 nonzero balances, greedy thereafter).
 - Free browser receipt OCR, editable text and final total, explicit BDT confirmation before adding a bill. JPEG/PNG/WebP up to 3 MB; no PDF/HEIC.
 - OCR languages: English, Bangla+English, Hindi+English, Arabic+English. Accuracy is not guaranteed or proven on local receipts. Handwriting and blurry receipts may need manual entry.
-- Portable JSON backup download/import (including partial repayments), phone-camera receipt input on supported devices, partial manual repayments, full-payment marks, copy/share/WhatsApp, JSON/CSV export, print, local draft save/restore, light/dark mode and optional effects.
+- Portable JSON backup download/import (including partial repayments), phone-camera receipt input on supported devices, partial manual repayments, full-payment marks, copy/share/WhatsApp, JSON/CSV export, print, local draft save/restore, light/dark mode and an optional lightweight static background.
 - Recipient-owned HTTPS payment links/QR and reference copying. No direct money transfers or provider verification.
 
 ## Privacy and downloads
@@ -28,4 +28,7 @@ Core mode makes no AI provider calls. Optional AI uses the provider/account tier
 UI/engine/OCR workflow tests include mocks of OCR; they do not prove real image recognition accuracy. Build runs the full test suite. Test real receipts and phones before reporting accuracy or user outcomes. See FREE_EDITION.md, TRIP_DEMO.md and BUILDATHON_READINESS.md.
 
 ## Third-party notices
-Tesseract.js is Apache-2.0: https://github.com/naptha/tesseract.js . It wraps the Tesseract OCR engine and neural-network language models. Model assets are fetched by the library. Existing React visual components and provenance files remain in ui/components. No cloud LLM is used; do not describe local note rules as AI.
+Tesseract.js is Apache-2.0: https://github.com/naptha/tesseract.js . It wraps the Tesseract OCR engine and neural-network language models. Model assets are fetched by the library. Existing React visual components and provenance files remain in ui/components. The core needs no cloud model. Optional server-side Gemini/Groq is available when configured; do not describe local note rules as generative AI.
+
+## Reliability release (beta.3)
+The live page and build use plain HTML/CSS/JavaScript and Node built-ins, with no third-party build packages or WebGL rendering. Archived visual source is retained for provenance, but is not bundled or executed. The optional OCR library downloads only when requested. Startup errors show a recovery message; reload does not erase the saved device draft. See BUILDATHON_READINESS.md for uncompleted real-world validation and sticker requirements.

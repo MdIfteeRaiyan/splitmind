@@ -1,3 +1,7 @@
+# v2 beta.3 — lightweight startup and recovery
+
+Removed the automatic WebGL/React decoration bundle from the production page and eliminated third-party build dependencies. Kept a subtle static background with an on/off control. Added JavaScript-disabled guidance, startup error recovery, explicit closed-dialog styling, and narrower-phone layout fixes. Member-removal regression coverage remains in place. No receipt accuracy or user-study results are claimed.
+
 # v2 beta.2 — Vercel build fix
 
 Adapter tests now isolate and restore their AI environment fixtures. Builds no longer assume production AI is disabled. Added adapter tests for Gemini enabled, text-only Groq and durable quota configuration. Production Gemini variables remain enabled and are not changed by deployment.
