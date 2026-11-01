@@ -5,7 +5,7 @@ Core bills, local notes, OCR, splits and sharing work without AI configuration.
 ## Gemini first
 1. Sign into https://aistudio.google.com/ using your chosen Google account. Create/select a project eligible for the Gemini API free tier. Confirm the project shows Free tier and check its model quota before using it. Do not enable paid billing if your goal is zero AI API charges. This app cannot inspect or enforce your provider billing plan.
 2. Create an API key. Paste it only in Vercel project Settings → Environment Variables as GEMINI_API_KEY for Production. Do not paste it into chat, frontend code or Git.
-3. Add AI_ENABLED=true and GEMINI_MODEL=gemini-2.5-flash. The model accepts text/images and has a listed free tier; availability, region and quota depend on the provider/account and can change. Verify in AI Studio.
+3. Add AI_ENABLED=true and GEMINI_MODEL=gemini-3.5-flash-lite. Confirm model access and any free-tier allowance in your own AI Studio project. A model name does not guarantee free usage or access.
 4. Optionally configure GROQ_API_KEY and GROQ_MODEL=llama-3.3-70b-versatile from your own Groq free-tier project. Groq is a text-only fallback in this implementation, not a receipt-image fallback. It is tried after temporary provider failures/rate limits; no OpenAI calls are made.
 5. Optional DEMO_ACCESS_CODE provides a shared judge/demo gate. Users enter the code under footer Connected tools; never enter a provider API key there. BYOK browser fields are intentionally not included.
 6. Deploy the new source to Vercel, then check /api/config. aiReady confirms key/config presence, not a successful provider call. visionReady needs Gemini. Test a real request to confirm the provider works.
@@ -34,3 +34,6 @@ Configuration presence is not a successful live request. Popups now preserve a s
 
 ## HTTP 404: model not found
 The variable name alone does not show its value. Check GEMINI_MODEL in Vercel: use the exact model ID supported by your API project, not a display name, a URL, or a retired preview ID. Whitespace and a leading models/ prefix are now normalized. Google documents listing models and filtering supportedGenerationMethods for generateContent at https://ai.google.dev/api/models . Availability does not by itself guarantee structured-output/vision support or a free quota; confirm the selected model in AI Studio. Redeploy after editing the variable. Do not share the API key.
+
+## Newer-model request compatibility
+Gemini 3.x requests use provider-default sampling and thinking settings. The legacy thinkingBudget:0 setting is sent only for explicitly chosen Gemini 2.5 Flash models. The Gemini 3.5 Flash-Lite default is reflected in .env.example; Vercel environment variables override that default. Structured output remains enabled and all output still requires validation and human review.

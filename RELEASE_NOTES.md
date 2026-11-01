@@ -1,3 +1,7 @@
+# v2 beta.10 — Gemini 3.x request compatibility
+
+Use the modern model default and omit legacy thinkingBudget:0 and temperature overrides for newer Gemini models. Preserve explicit 2.5 Flash compatibility. Tests inspect the outbound request body for each model family. Live provider success still requires the deployment owner’s configured project and quota.
+
 # v2 beta.9 — centered popups and quieter notes
 
 Centered validation and first-visit panels without modal input locking. Removed the repeated notes examples; kept the homepage picker. Reduced nearby copy and moved detailed limitations/privacy into a disclosure. Normalized Gemini model IDs and clarified HTTP 404 resolution. Live project model access still needs validation by its owner.
