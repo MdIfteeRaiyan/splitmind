@@ -1,3 +1,7 @@
+# v2 beta.4 — section guidance and control refinement
+
+Added concise expandable guidance to all four steps, a live bill-review summary, descriptive control titles, consistent touch targets, destructive-action styling and narrower-phone action layouts. Clarified saved-copy deletion and backup/report differences. Core accounting and optional AI behavior are unchanged.
+
 # v2 beta.3 — lightweight startup and recovery
 
 Removed the automatic WebGL/React decoration bundle from the production page and eliminated third-party build dependencies. Kept a subtle static background with an on/off control. Added JavaScript-disabled guidance, startup error recovery, explicit closed-dialog styling, and narrower-phone layout fixes. Member-removal regression coverage remains in place. No receipt accuracy or user-study results are claimed.
