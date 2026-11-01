@@ -1,3 +1,7 @@
+# v2 beta.6 — verified click routing regression
+
+The document root carries data-step for styling. The old delegated click handler matched that root for ordinary input clicks, navigating back to the current step and stealing focus. Restricting the selector to button[data-step] fixes the cause. A regression with ancestor matching fails on the old selector (five unintended navigations) and passes on the fix.
+
 # v2 beta.5 — input stability
 
 Name and note typing no longer changes wizard visibility on every keystroke. Group validation uses a dismissible non-modal popup, never browser page-wide inertness, and clears when a name is corrected. Regression checks cover continuous English/Bangla typing and typing after invalid submission. Browser interaction still requires verification.

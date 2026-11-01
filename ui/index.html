@@ -243,7 +243,7 @@ async function navigateStep(id){
  if(!draft||(!draft.expenses.length&&!draft.debts.length)){showStepNotice(id,'Add a bill and review its amount before calculating who pays whom.','stepInput','Add a bill');return}
  const ready=await confirmPlan();if(!ready){showStepNotice('stepPlan','Your bills need attention. Check bill amounts, participants and any custom shares before calculating.','stepReview','Review your bills')}
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(b)return navigateStep(b.dataset.step)});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-step]');if(b)return navigateStep(b.dataset.step)});
 
 function compute(){
  const cents=Object.fromEntries(members.map(m=>[m.name,0])),pair=new Map();let total=0;
