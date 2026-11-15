@@ -6,7 +6,7 @@ Implemented: optional server-side AI chat extraction, Gemini receipt vision with
 - Gemini was configured on Vercel and reported working by the owner. Recheck one live extraction on the final deployed build; automated provider tests use mocks and do not prove model accuracy.
 - Scan 10 permitted real BDT receipts. Enter human-checked totals first, record returned total/items/taxes, uncertainty and corrections. Report exact counts and denominator, not invented accuracy. See evidence/receipt-tests.csv.
 - Test five first-time users on their phones: group, bill/chat, receipt review, settlement, partial payment and sharing without coaching. Log errors, time, assistance and retest fixes. See evidence/phone-tests.csv.
-- Obtain/add the official sticker. The prior text banner was removed at the user's request; sticker compliance remains pending.
+- The supplied Buildathon sticker is displayed on the opening Group step.
 - Record actual app footage. Never represent local examples, mocked tests or fallback drafts as live AI.
 
 ## Scope limits

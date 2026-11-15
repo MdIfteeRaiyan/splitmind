@@ -19,7 +19,7 @@ Browser automation was unavailable during this review. Actual phone layout, rece
 
 ## Before submission or a broad launch
 
-1. Add the official buildathon sticker when supplied.
+1. Verify the supplied Buildathon sticker on the public Vercel deployment after updating.
 2. Recheck one real AI extraction after deploying this source.
 3. Complete the real-receipt and five-user phone checks in BUILDATHON_READINESS.md.
 4. Configure and verify the documented shared AI quota protection before inviting a large public audience. Local core tools do not need an AI key.
