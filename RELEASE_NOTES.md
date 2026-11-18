@@ -1,3 +1,7 @@
+# v2 beta.12 — resilient AI for judging
+
+When Gemini answers 503 (busy) the server now retries the configured model once, then tries gemini-3.1-flash-lite and gemini-2.5-flash before Groq or the local fallback; 429 and missing-model errors skip straight to the next model. Key and permission errors still stop immediately with the same diagnostics. Receipts use the same fallback chain. Optional GEMINI_FALLBACK_MODELS overrides the list. Footer copyright spacing fixed; the "Inputs changed" notice now appears only when a plan existed. 116 automated tests.
+
 # v2 beta.11 — compact transfers and restrained motion
 
 Reorganized transfer cards around full From/To identities and an adjacent amount on desktop, stacking cleanly on phones. Added short view transitions, popup/content fades, control feedback and a payment-record highlight, with keyboard focus restored after recording. Motion can be disabled in Appearance, persists on the browser and respects reduced-motion settings. No AI provider or accounting changes.
