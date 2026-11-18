@@ -260,6 +260,116 @@ function noteAmount(text){
  const n=Number(raw.replace(/,/g,''));
  return n>0&&n<=1000000?n:0;
 }
+/* banglish:start */
+// Deterministic Banglish money grammar. Used to check AI results and to read notes locally.
+// Only clear, single-amount statements produce rules; anything else is left for AI or review.
+const BN_WORDS={
+ receive:/^(?:pay|pai|pae|pabe|paibe|paibo|pabo|paben|pawna|paona|paowa|pawa|gets?|receives?)$/,
+ afterPay:/^(?:kor\S*|dis\S*|dil\S*|diy\S*|done)$/,
+ paid:/^(?:dise|disi|dilo|dilam|disilo|disila|diyeche|diyechi|diyese|diyesi|paid|kinse|kinlo|kineche|kinsi|bhorse|bhorlo|vorse|vorlo|bhoreche)$/,
+ give:/^(?:dibe|debe|diba|diben|dibi|dite|deya|dewa|ferot)$/,
+ borrow:/^(?:nise|nilo|nisilo|nisi|niyeche|niyechi|niyese|nilam|borrowed)$/,
+ owe:/^(?:dhar|dhaar|rin|baki|bakee|owes?)$/,
+ treat:/^kh(?:a|o)o?[wy][aoy]*i[sclhy]/,
+ group:/^(?:sobai|shobai|sobar|shobar|sobaike|shobaike|amra|amader|amaderke|all|everyone|everybody|split|share|bhag|vag|duijon|dujon|tinjon|charjon|jon|both)$/,
+ bill:/^(?:bill|bil|vara|bhara|fee|fees|recharge|khoroch|khorch|ticket|wifi|net|internet|current|biddut|gas|rent|tuition|mobile|phone|data|beton|kisti)$/,
+ source:/^(?:theke|thake|from)$/,
+ kache:/^(?:kache|kase|kach|kachhe)$/,
+ obj:/^(?:ke|re)$/,
+ poss:/^(?:er|r|ar)$/,
+ count:/^(?:jon|people|person|persons|ta|ti|din|days?)$/,
+ filler:/^(?:tk|taka|takar|tkr|bdt|abar|ager|age|er|r|ar|ke|re|betay|beta|jonno|for|the|and|ar|o|tao|ta|ki|na|but|kintu|ekta|already|mot|total)$/
+};
+function bnNormalize(text){return String(text||'').replace(/[০-৯]/g,d=>String('০১২৩৪৫৬৭৮৯'.indexOf(d)))}
+function bnClauses(text){
+ const parts=bnNormalize(text).split(/\n|[;।!?]|\.(?!\d)|,(?=\s*\p{L})/u).map(s=>s.trim()).filter(Boolean),out=[];
+ for(const p of parts){if(!/\d/.test(p)&&out.length)out[out.length-1]+=', '+p;else out.push(p)}
+ return out;
+}
+function bnAmount(raw){const n=Number(String(raw).replace(/,/g,''));return Number.isFinite(n)&&n>=0.01&&n<=1000000&&Math.abs(n*100-Math.round(n*100))<1e-6?n:0}
+function bnEntities(tokens,names){
+ const lower=names.map(n=>[n.toLowerCase(),n]).sort((a,b)=>b[0].length-a[0].length),found=[];
+ for(let i=0;i<tokens.length;i++){
+  const t=tokens[i];let name=null,role=null;
+  const exact=lower.find(([l])=>l===t);
+  if(exact){name=exact[1];role='nom'}
+  else for(const [suffix,r] of [['theke','source'],['kache','kache'],['ke','obj'],['re','obj'],['er','poss'],['ar','poss'],['r','poss']]){
+   if(!t.endsWith(suffix))continue;const hit=lower.find(([l])=>l===t.slice(0,-suffix.length));if(hit){name=hit[1];role=r;break}
+  }
+  if(!name)continue;
+  const next=tokens[i+1]||'',after=tokens[i+2]||'';
+  if(role==='nom'){if(BN_WORDS.source.test(next))role='source';else if(BN_WORDS.obj.test(next))role='obj';else if(BN_WORDS.poss.test(next))role=BN_WORDS.kache.test(after)?'source':'poss'}
+  else if(role==='poss'&&BN_WORDS.kache.test(next))role='source';
+  else if(role==='kache')role='source';
+  found.push({name,role,i});
+ }
+ return found;
+}
+function banglishRules(text,names){
+ const rules=[];let lastSubject=null;
+ bnClauses(text).forEach((clause,index)=>{
+  const tokens=clause.toLowerCase().match(/[\p{L}\p{M}]+|\d[\d,]*(?:\.\d+)?/gu)||[];
+  const amounts=tokens.map((t,i)=>/^\d/.test(t)&&!BN_WORDS.count.test(tokens[i+1]||'')?bnAmount(t):null).filter(a=>a!==null);
+  const ents=bnEntities(tokens,names),subject=[...new Set(ents.filter(e=>e.role==='nom').map(e=>e.name))];
+  const carried=lastSubject;if(subject.length===1)lastSubject=subject[0];
+  if(amounts.length!==1||!amounts[0])return;
+  const amount=amounts[0];
+  const role=r=>[...new Set(ents.filter(e=>e.role===r).map(e=>e.name))];
+  const nom=role('nom'),src=role('source'),obj=role('obj'),poss=role('poss');
+  const has=k=>tokens.some(t=>BN_WORDS[k].test(t));
+  const payVerb=tokens.some((t,i)=>t==='pay'&&BN_WORDS.afterPay.test(tokens[i+1]||''));
+  const receive=tokens.some((t,i)=>BN_WORDS.receive.test(t)&&!(t==='pay'&&BN_WORDS.afterPay.test(tokens[i+1]||'')));
+  const paid=has('paid')||payVerb,give=has('give'),borrow=has('borrow'),owe=has('owe'),treat=has('treat'),group=has('group');
+  const used=new Set(ents.map(e=>e.i));
+  const words=tokens.filter((t,i)=>!used.has(i)&&!/^\d/.test(t)&&!['receive','paid','give','borrow','owe','treat','group','source','kache','obj','filler','afterPay'].some(k=>BN_WORDS[k].test(t))&&t!=='pay');
+  const add=r=>rules.push({...r,description:words.join(' ').slice(0,60)||r.description,amount,clause,index});
+  if(receive&&!paid&&!give&&nom.length===1&&src.length===1&&nom[0]!==src[0])return add({kind:'debt',from:src[0],to:nom[0]});
+  if(borrow&&!receive&&nom.length===1&&src.length===1&&nom[0]!==src[0])return add({kind:'debt',from:nom[0],to:src[0]});
+  if(give&&!paid&&!receive&&nom.length===1&&obj.length===1&&nom[0]!==obj[0])return add({kind:'debt',from:nom[0],to:obj[0]});
+  if(treat&&!group&&nom.length===1&&obj.length&&!obj.includes(nom[0]))return add({kind:'expense',payer:nom[0],participants:obj,description:'Treat'});
+  if(owe&&!paid&&!receive&&!treat&&nom.length===1&&obj.length===1&&nom[0]!==obj[0])return add({kind:'debt',from:nom[0],to:obj[0]});
+  if(paid&&!group&&!obj.length&&poss.length===1&&!nom.includes(poss[0])&&nom.length<=1){
+   const at=ents.find(e=>e.role==='poss').i;
+   if(tokens.slice(at+1,at+5).some(t=>BN_WORDS.bill.test(t)))return add({kind:'expense',payer:nom[0]||null,payerGuess:nom[0]?null:(carried&&carried!==poss[0]?carried:null),participants:poss,description:'Bill'});
+  }
+ });
+ return rules;
+}
+function applyBanglishRules(ledger,rules,unknown){
+ const expenses=ledger.expenses.map(e=>({...e,participants:[...e.participants]})),debts=ledger.debts.map(d=>({...d}));
+ let fixes=0;const used=new Set(),drop=new Set();
+ const cents=n=>Math.round(n*100),sameSet=(a,b)=>a.length===b.length&&a.every(x=>b.includes(x));
+ for(const r of rules){
+  const people=r.kind==='debt'?[r.from,r.to]:[...(r.payer?[r.payer]:[]),...r.participants];
+  const score=list=>people.filter(p=>list.includes(p)).length;
+  const cands=[...debts.map((d,i)=>({type:'debt',i,item:d,people:[d.from,d.to]})),...expenses.map((e,i)=>({type:'expense',i,item:e,people:[e.payer,...e.participants]}))]
+   .filter(c=>!used.has(c.type+c.i)&&!drop.has(c.i+':'+c.type)&&cents(c.item.amount)===cents(r.amount)).sort((a,b)=>score(b.people)-score(a.people));
+  if(cands.length>1&&score(cands[0].people)===score(cands[1].people))continue;
+  const c=cands[0];
+  if(!c){
+   if(r.kind==='debt'){debts.push({from:r.from,to:r.to,amount:r.amount});used.add('debt'+(debts.length-1));fixes++}
+   else if(r.payer){expenses.push({payer:r.payer,amount:r.amount,description:r.description,participants:[...r.participants]});used.add('expense'+(expenses.length-1));fixes++}
+   else continue;
+   unknown=unknown.filter(u=>!(bnNormalize(u).includes(String(r.amount))&&people.some(p=>u.toLowerCase().includes(p.toLowerCase()))));
+   continue;
+  }
+  used.add(c.type+c.i);
+  if(r.kind==='debt'){
+   if(c.type==='debt'){if(c.item.from!==r.from||c.item.to!==r.to){c.item.from=r.from;c.item.to=r.to;fixes++}}
+   else{drop.add(c.i+':expense');debts.push({from:r.from,to:r.to,amount:r.amount});used.add('debt'+(debts.length-1));fixes++}
+  }else if(c.type==='expense'){
+   if(r.payer&&c.item.payer!==r.payer){c.item.payer=r.payer;fixes++}
+   // Someone's own bill paid by themselves is not a group expense: the omitted Banglish subject carries over.
+   else if(!r.payer&&r.payerGuess&&r.participants.length===1&&c.item.payer===r.participants[0]){c.item.payer=r.payerGuess;fixes++}
+   if(!sameSet(c.item.participants,r.participants)){c.item.participants=[...r.participants];fixes++}
+  }else{
+   const payer=r.payer||c.item.to;
+   if(r.participants.length===1&&(c.item.from!==r.participants[0]||c.item.to!==payer)&&payer!==r.participants[0]){c.item.from=r.participants[0];c.item.to=payer;fixes++}
+  }
+ }
+ return{ledger:{expenses:expenses.filter((_,i)=>!drop.has(i+':expense')),debts},unknown,fixes};
+}
+/* banglish:end */
 function localParse(text){
  const names=members.map(m=>m.name), out={expenses:[],debts:[],unknown:[]};
  const find=t=>names.find(n=>n.toLowerCase()===t.trim().toLowerCase());
@@ -289,6 +399,8 @@ function localParse(text){
   if(!Number.isFinite(amount)||amount<=0){out.unknown.push(line);continue}
   out.expenses.push({payer,amount,participants,description:niceDescription(rest.replace(/^(?:paid)\s*/i,'').replace(amt[0],'').replace(/^(?:\s*(?:tk|taka|bdt|for)\b)+/i,'').split(',')[0].trim())||'Shared expense'});
  }
+ // Clear Banglish statements inside an unread line become entries; only the unclear parts stay for review.
+ const keep=[];for(const u of out.unknown){const rules=banglishRules(u,names).filter(r=>r.kind==='debt'||r.payer);if(!rules.length){keep.push(u);continue}const done=new Set(rules.map(r=>r.index));for(const r of rules){if(r.kind==='debt')out.debts.push({from:r.from,to:r.to,amount:r.amount});else out.expenses.push({payer:r.payer,amount:r.amount,participants:[...r.participants],description:niceDescription(r.description)||'Shared expense'})}bnClauses(u).forEach((c,i)=>{if(!done.has(i)&&/\d/.test(c))keep.push(c)})}out.unknown=keep;
  return out;
 }
 function categoryIcon(text){const t=String(text||'').toLowerCase();for(const [re,ic] of [[/hotel|resort|room|stay|hostel|হোটেল/,'🏨'],[/rent|flat|house|basha|bari|ভাড়া/,'🏠'],[/tea|\bcha\b|coffee|চা/,'☕'],[/dinner|lunch|breakfast|food|meal|restaurant|biryani|kacchi|khabar|khawa|nasta|snack|seafood|pizza|burger|iftar|খাবার|ডিনার/,'🍽️'],[/flight|plane|air ?ticket|বিমান/,'✈️'],[/uber|pathao|cng|rickshaw|bus|microbus|taxi|car|fuel|petrol|train|launch|transport|ride|গাড়ি|বাস/,'🚗'],[/movie|cinema|concert|game|park|ticket|show|সিনেমা/,'🎬'],[/electric|wifi|internet|gas|utility|phone|recharge|বিদ্যুৎ/,'💡'],[/medicine|doctor|pharmacy|hospital|ঔষধ|ডাক্তার/,'💊'],[/gift|birthday|cake|উপহার/,'🎁'],[/grocer|bazar|market|shop|mall|বাজার/,'🛒']])if(re.test(t))return ic;return '🧾'}
@@ -458,7 +570,7 @@ window.addEventListener?.('pagehide',()=>saveCurrentDraft());
 function receiptMarkup(r){if(!r||r.currency!=='BDT'||!Array.isArray(r.items)||r.items.some(i=>!i||typeof i.label!=='string'||typeof i.amount!=='number'||!Number.isFinite(i.amount)))return '';return '<details class="receipt-breakdown"><summary>Receipt items, VAT & charges</summary><p class="tag">AI reading · check against your receipt. These values are not added again.</p><ul>'+r.items.slice(0,100).map(i=>'<li>'+esc(i.label)+' — ৳'+money(i.amount)+'</li>').join('')+'</ul>'+['subtotal','vat','serviceCharge','discount','total'].filter(k=>typeof r[k]==='number').map(k=>'<p>'+esc({subtotal:'Subtotal',vat:'VAT',serviceCharge:'Service charge',discount:'Discount',total:'Final total'}[k])+': ৳'+money(r[k])+'</p>').join('')+'</details>'}
 async function refreshAI(){try{const r=await fetch('/api/config',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error();aiConfig=await r.json();$('#readChat').disabled=chatBusy;$('#generateAssistant').disabled=!aiConfig.aiReady;$('#aiAccess').hidden=!aiConfig.accessRequired;$('#aiChip').hidden=!aiConfig.aiReady;$('#aiStatus').textContent=aiConfig.aiReady?'AI configured · results need review.':'AI is not configured on this deployment. Select Extract with AI to retry; local reading is available.';updateBillControls()}catch{$('#readChat').disabled=chatBusy;$('#aiStatus').textContent='Could not check AI availability. Select Extract with AI to retry; local tools remain available.'}}
 async function callAI(route,payload){let r;try{r=await fetch('/api/'+route,{method:'POST',headers:{'Content-Type':'application/json','X-Demo-Access':$('#demoCode').value||''},body:JSON.stringify(payload),signal:AbortSignal.timeout(58000)})}catch(error){if(error?.name==='TimeoutError'||error?.name==='AbortError')throw Error('AI reading took too long. Your notes are kept. Retry with fewer entries, or enter bills manually.');throw Error('Could not reach AI. Check your connection and try again.')}let result;try{result=await r.json()}catch{throw Error('AI service did not respond. Use local tools.')}if(!r.ok)throw Error(result.error||'AI service unavailable.');return result}
-$('#readChat').onclick=async()=>{if(chatBusy)return;if(!requireGroup())return;if(!$('#txt').value.trim()){showValidation('Paste your expense notes first, or use Add a bill for manual entry.','#txt','Expense notes are empty');return}if(draft&&(draft.expenses.length||draft.debts.length)&&!window.confirm('Replace current bills with the expenses extracted from this chat?'))return;const text=$('#txt').value,rev=revision;if(!text.trim()){showValidation('Paste your expense notes first, or use Add a bill for manual entry.','#txt','Expense notes are empty');return}chatBusy=true;$('#readChat').disabled=true;$('#readChat').textContent='Reading notes…';const waitTimer=setTimeout(()=>{if(chatBusy&&rev===revision)$('#readChat').textContent='Still reading…'},8000);$('#status').textContent='Extracting expenses with AI…';try{const parsed=await callAI('parse',{members:members.map(m=>m.name),text});if(rev!==revision||text!==$('#txt').value){$('#status').textContent='Notes changed. Extract again to review the latest text.';return}draft=parsed;draftSource='ai';res=null;data=null;paid={};verified={};method={};revision++;ledgerRevision++;review();goStep('stepReview');$('#status').textContent='AI proposes; you confirm. Check every payer, amount and participant.'}catch(e){if(rev!==revision||text!==$('#txt').value)return;draft=localParse(text);draftSource='local';res=null;data=null;paid={};verified={};method={};revision++;ledgerRevision++;review();goStep('stepReview');reportError(e.message+' Local rules were used instead. Review the recognized bills and correct or exclude unclear items.','#status','AI extraction could not finish')}finally{clearTimeout(waitTimer);chatBusy=false;$('#readChat').disabled=false;$('#readChat').textContent='Extract with AI'}};
+$('#readChat').onclick=async()=>{if(chatBusy)return;if(!requireGroup())return;if(!$('#txt').value.trim()){showValidation('Paste your expense notes first, or use Add a bill for manual entry.','#txt','Expense notes are empty');return}if(draft&&(draft.expenses.length||draft.debts.length)&&!window.confirm('Replace current bills with the expenses extracted from this chat?'))return;const text=$('#txt').value,rev=revision;if(!text.trim()){showValidation('Paste your expense notes first, or use Add a bill for manual entry.','#txt','Expense notes are empty');return}chatBusy=true;$('#readChat').disabled=true;$('#readChat').textContent='Reading notes…';const waitTimer=setTimeout(()=>{if(chatBusy&&rev===revision)$('#readChat').textContent='Still reading…'},8000);$('#status').textContent='Extracting expenses with AI…';try{const parsed=await callAI('parse',{members:members.map(m=>m.name),text});if(rev!==revision||text!==$('#txt').value){$('#status').textContent='Notes changed. Extract again to review the latest text.';return}(parsed.expenses||[]).forEach(e=>{e.description=niceDescription(e.description)||e.description});draft=parsed;draftSource='ai';res=null;data=null;paid={};verified={};method={};revision++;ledgerRevision++;review();goStep('stepReview');$('#status').textContent='AI proposes; you confirm. Check every payer, amount and participant.'+(parsed.checked?' Banglish check corrected '+parsed.checked+(parsed.checked===1?' detail.':' details.'):'')}catch(e){if(rev!==revision||text!==$('#txt').value)return;draft=localParse(text);draftSource='local';res=null;data=null;paid={};verified={};method={};revision++;ledgerRevision++;review();goStep('stepReview');reportError(e.message+' Local rules were used instead. Review the recognized bills and correct or exclude unclear items.','#status','AI extraction could not finish')}finally{clearTimeout(waitTimer);chatBusy=false;$('#readChat').disabled=false;$('#readChat').textContent='Extract with AI'}};
 $('#readVision').onclick=async()=>{if(billBusy)return;let rev,generation;try{const c=receiptContext();rev=revision;generation=billGeneration;billBusy=true;updateBillControls();$('#billStatus').textContent='Reading receipt with vision AI…';const parsed=await callAI('parse',{members:members.map(m=>m.name),text:'Read this BDT receipt. Separate printed items, VAT and service charges; use final payable total once.',image:billData,...c});if(rev!==revision||generation!==billGeneration){$('#billStatus').textContent='Inputs changed. Read the receipt again.';return}if(!parsed.expenses.length||parsed.unknown?.length){$('#billStatus').textContent='No bill added. '+(parsed.unknown||[]).join(' ')+' Use on-device OCR or enter the total yourself.';return}addReceiptDraft(parsed,'ai');billConsumed=true;$('#billStatus').textContent='AI receipt added for review. Check items, VAT, final total and people; no payment was made.'}catch(e){reportError(e.message+' On-device OCR and manual entry remain available.','#billStatus','Receipt AI could not finish')}finally{billBusy=false;updateBillControls()}};
 function balanceFacts(name){if(!data||!res)return '';let credit=0,share=0;const lines=[];for(const e of data.expenses){if(e.payer===name){credit+=Math.round(e.amount*100);lines.push('Paid: '+e.description+' · ৳'+money(e.amount))}const j=e.participants.indexOf(name);if(j>=0){const cents=Math.round(e.amount*100),v=e.shares===undefined?Math.floor(cents/e.participants.length)+(j<cents%e.participants.length?1:0):Math.round(e.shares[j]*100);share+=v;lines.push('Your share: '+e.description+' · ৳'+money(v/100))}}for(const d of data.debts){if(d.to===name)lines.push((d.kind==='repayment'?'Manual repayment adjustment':'Previous amount to receive')+': +৳'+money(d.amount));if(d.from===name)lines.push((d.kind==='repayment'?'Manual repayment adjustment':'Previous amount owed')+': −৳'+money(d.amount))}return [name,'Paid for bills: ৳'+money(credit/100),'Your bill shares: ৳'+money(share/100),...lines,'Net balance: '+(res.bal[name]>=0?'receive ':'pay ')+'৳'+money(Math.abs(res.bal[name])),'Manual payment records are not provider verification.'].join('\n')}
 let assistantContext=null;
