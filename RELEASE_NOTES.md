@@ -1,6 +1,6 @@
 # v2 beta.12 — resilient AI for judging
 
-When Gemini answers 503 (busy) the server now retries the configured model once, then tries gemini-3.1-flash-lite and gemini-2.5-flash before Groq or the local fallback; 429 and missing-model errors skip straight to the next model. Key and permission errors still stop immediately with the same diagnostics. Receipts use the same fallback chain. Optional GEMINI_FALLBACK_MODELS overrides the list. Footer copyright spacing fixed; the "Inputs changed" notice now appears only when a plan existed. 116 automated tests.
+When Gemini answers 503 (busy) the server now retries the configured model once, then tries gemini-3.1-flash-lite and gemini-2.5-flash before Groq or the local fallback; 429 and missing-model errors skip straight to the next model. Key and permission errors still stop immediately with the same diagnostics. Receipts use the same fallback chain. Optional GEMINI_FALLBACK_MODELS overrides the list. Footer copyright spacing fixed; the "Inputs changed" notice now appears only when a plan existed. The chat entry is now labelled "Paste your group chat", opens by default and shows an AI badge only when AI is connected; review cards show a category icon; descriptions are tidied ("the microbus" → "Microbus"); per-person balances open by default; a fully recorded plan reads "All settled up." 117 automated tests.
 
 # v2 beta.11 — compact transfers and restrained motion
 

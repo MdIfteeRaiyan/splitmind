@@ -14,7 +14,7 @@ Suggested title: **SplitMind — AI bill splitter for Bangladesh | YUNet AIgnite
 
 > "I add the people who shared the costs. Payment details like bKash or Nagad are optional."
 
-**0:30–1:00 · AI extraction (the key moment)** — *Expenses → "Use notes instead" → paste the text below → "Extract with AI".*
+**0:30–1:00 · AI extraction (the key moment)** — *Expenses → "Paste your group chat" (already open) → paste the text below → "Extract with AI".*
 
 ```
 Rahim dinner er bill dise 1500 taka, sobai share korbo. Karim uber e 450 dilo amra 3 jon. Sadia cinema ticket 900 but Karim jai nai. Karim Rahim ke ager 200 dhar.
@@ -22,11 +22,11 @@ Rahim dinner er bill dise 1500 taka, sobai share korbo. Karim uber e 450 dilo am
 
 > "Instead of typing every bill, I paste the chat exactly as it was written. Gemini reads the Banglish and builds a structured ledger: three bills and one old debt. Notice it understood 'Karim jai nai' — Karim didn't go — so he's left out of the cinema ticket."
 
-**1:00–1:15 · Human review** — *Scroll through the review cards; change one checkbox and change it back.*
+**1:00–1:15 · Human review** — *Scroll through the review cards (each has a category icon); change one checkbox and change it back.*
 
 > "AI proposes, I confirm. Every payer, amount and participant is editable, and nothing reaches the plan until I continue."
 
-**1:15–1:40 · Settlement** — *Continue to settlement. Point at the two transfer cards. Open "Paid part of this amount?" and "Write reminder".*
+**1:15–1:40 · Settlement** — *Continue to settlement. Point at the two transfer cards and the per-person balances. Open "Write reminder", then mark both payments paid to show "All settled up."*
 
 > "SplitMind calculates in exact poisha and finds the fewest transfers: Karim pays Rahim 400 taka, Sadia pays Rahim 200. I can record a partial payment, write a reminder in English, Bangla or Banglish, or hand off on WhatsApp. SplitMind never touches the money itself."
 
