@@ -7,7 +7,8 @@
   "scripts": {
     "build": "node scripts/build.mjs && npm test",
     "start": "node --env-file-if-exists=.env scripts/dev.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "dev": "node --env-file-if-exists=.env scripts/dev.mjs"
   },
   "engines": {
     "node": "22.x"

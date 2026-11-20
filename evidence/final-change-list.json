@@ -1,0 +1,50 @@
+[
+  {
+    "path": "FINAL_AUDIT.md",
+    "change": "added"
+  },
+  {
+    "path": "RECEIPT_AND_PHONE_TESTING.md",
+    "change": "modified"
+  },
+  {
+    "path": "package.json",
+    "change": "modified"
+  },
+  {
+    "path": "evidence/final-build-tests.txt",
+    "change": "added"
+  },
+  {
+    "path": "ui/index.html",
+    "change": "modified"
+  },
+  {
+    "path": "tests/api.test.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "tests/banglish.test.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "tests/effects.test.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "tests/ui.test.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "scripts/dev.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "worker/banglish.mjs",
+    "change": "modified"
+  },
+  {
+    "path": "worker/index.js",
+    "change": "modified"
+  }
+]

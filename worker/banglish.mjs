@@ -24,7 +24,7 @@ function bnClauses(text){
  for(const p of parts){if(!/\d/.test(p)&&out.length)out[out.length-1]+=', '+p;else out.push(p)}
  return out;
 }
-function bnAmount(raw){const n=Number(String(raw).replace(/,/g,''));return Number.isFinite(n)&&n>=0.01&&n<=1000000&&Math.abs(n*100-Math.round(n*100))<1e-6?n:0}
+function bnAmount(raw){if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(String(raw)))return 0;const n=Number(String(raw).replace(/,/g,''));return Number.isFinite(n)&&n>=0.01&&n<=1000000&&Math.abs(n*100-Math.round(n*100))<1e-6?n:0}
 function bnEntities(tokens,names){
  const lower=names.map(n=>[n.toLowerCase(),n]).sort((a,b)=>b[0].length-a[0].length),found=[];
  for(let i=0;i<tokens.length;i++){
@@ -46,6 +46,7 @@ function bnEntities(tokens,names){
 function banglishRules(text,names){
  const rules=[];let lastSubject=null;
  bnClauses(text).forEach((clause,index)=>{
+  if(/[-−–]\s*\d|[$€£₹]|\b(?:usd|eur|gbp|inr|dollars?|rupees?)\b/i.test(clause))return;
   const tokens=clause.toLowerCase().match(/[\p{L}\p{M}]+|\d[\d,]*(?:\.\d+)?/gu)||[];
   const amounts=tokens.map((t,i)=>/^\d/.test(t)&&!BN_WORDS.count.test(tokens[i+1]||'')?bnAmount(t):null).filter(a=>a!==null);
   const ents=bnEntities(tokens,names),subject=[...new Set(ents.filter(e=>e.role==='nom').map(e=>e.name))];
@@ -83,6 +84,7 @@ function applyBanglishRules(ledger,rules,unknown){
   const cands=[...debts.map((d,i)=>({type:'debt',i,item:d,people:[d.from,d.to]})),...expenses.map((e,i)=>({type:'expense',i,item:e,people:[e.payer,...e.participants]}))]
    .filter(c=>!used.has(c.type+c.i)&&!drop.has(c.i+':'+c.type)&&cents(c.item.amount)===cents(r.amount)).sort((a,b)=>score(b.people)-score(a.people));
   if(cands.length>1&&score(cands[0].people)===score(cands[1].people))continue;
+  if(cands.length&&score(cands[0].people)===0)continue;
   const c=cands[0];
   if(!c){
    if(r.kind==='debt'){debts.push({from:r.from,to:r.to,amount:r.amount});used.add('debt'+(debts.length-1));fixes++}

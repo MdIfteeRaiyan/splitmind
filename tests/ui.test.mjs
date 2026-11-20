@@ -117,3 +117,55 @@ test('local reading flags several statements on one line rather than dropping la
 test('Banglish notes retain unambiguous amounts without guessing an unclear transfer',async()=>{const ui=setup();ui.run(String.raw`members=[{name:'iftee'},{name:'samin'}];draft=localParse('samin betay iftee ke 500 dibe\niftee 520 pay samin theke\nsamin 22tk dise birir tk iftee ke');review()`);assert.equal(ui.run('draft.debts[0].amount'),500);assert.equal(ui.run('draft.debts[0].to'),'iftee');assert.equal(ui.run('draft.debts[1].amount'),520);assert.equal(ui.run('draft.debts[1].from'),'samin');assert.equal(ui.run('draft.debts[1].to'),'iftee');assert.equal(ui.run('draft.unknown.length'),1);await ui.click('resolve',{resolveUnknown:'0'});assert.equal(ui.run('draft.expenses[0].amount'),22);assert.equal(ui.run('draft.expenses[0].payer'),'');await ui.click('confirm');assert.equal(ui.run('res'),null);assert.equal(ui.run("noteAmount('৳১,২৫০.৫০')"),1250.5);assert.equal(ui.run("noteAmount('500 or 520')"),0);assert.equal(ui.run("noteAmount('USD 22')"),0);});
 test('review cards show a category icon and tidy descriptions without changing amounts',()=>{const ui=setup(undefined,false);assert.equal(ui.run("niceDescription('the Cox\\'s Bazar hotel')"),"Cox's Bazar hotel");assert.equal(ui.run("niceDescription('seafood dinner')"),'Seafood dinner');assert.equal(ui.run("niceDescription('রাতের খাবার')"),'রাতের খাবার');for(const [text,icon] of [["Cox's Bazar hotel",'🏨'],['Seafood dinner','🍽️'],['Uber','🚗'],['cinema ticket','🎬'],['Bazar shopping','🛒'],['misc','🧾']])assert.equal(ui.run(`categoryIcon(${JSON.stringify(text)})`),icon);ui.run("members=['Rafi','Nusrat','Tanvir','Mim'].map(name=>({name}))");const parsed=ui.run(`localParse("Tanvir paid 6000 for the Cox's Bazar hotel, all 4 split.")`);assert.equal(parsed.expenses[0].description,"Cox's Bazar hotel");assert.equal(parsed.expenses[0].amount,6000);assert.equal(parsed.expenses[0].participants.length,4)});
 test('local reading understands the reported Banglish note and leaves only the payer-less bill for review',()=>{const ui=setup(undefined,false);ui.run("members=['iftee','samin','omor','ifty'].map(name=>({name}))");const r=ui.run("localParse('iftee samin theke 50 pay,iftyr wifi er bill dise 700 tk,omor abar iftee theke 170 pay.omorke iftee cha khayaise 20 tkr')");assert.equal(JSON.stringify(r.debts.map(d=>[d.from,d.to,d.amount])),JSON.stringify([['samin','iftee',50],['iftee','omor',170]]));assert.equal(r.expenses.length,1);assert.equal(r.expenses[0].payer,'iftee');assert.equal(JSON.stringify(r.expenses[0].participants),'["omor"]');assert.equal(r.expenses[0].description,'Cha');assert.equal(r.unknown.length,1);assert(r.unknown[0].includes('700'))});
+
+test('live typing commits manual bills before another action or autosave',async()=>{
+ const ui=setup(undefined,false);ui.run("members[0].name='Rahim';members[1].name='Rina';$('#manualStart').onclick()");
+ for(const h of ui.handlers.input)h({target:{dataset:{review:'expense',index:'0',field:'amount'},value:'1500'}});
+ for(const h of ui.handlers.input)h({target:{dataset:{review:'expense',index:'0',field:'description'},value:'Dinner'}});
+ assert.equal(ui.run('draft.expenses[0].amount'),1500);assert.equal(ui.run('draft.expenses[0].description'),'Dinner');
+ await ui.click('addExpense');assert.equal(ui.run('draft.expenses[0].amount'),1500);assert.equal(ui.run('draft.expenses[0].description'),'Dinner');
+});
+
+test('adding a manual bill preserves recognized bills and unresolved notes',()=>{
+ const ui=setup();ui.run("run();draft.unknown.push('check this 500');globalThis.previousAmount=draft.expenses[0].amount;globalThis.previousCount=draft.expenses.length;$('#manualStart').onclick()");
+ assert.equal(ui.run('draft.expenses.length'),ui.run('previousCount')+1);assert.equal(ui.run('draft.expenses[0].amount'),ui.run('previousAmount'));assert.equal(ui.run('draft.unknown[0]'),'check this 500');
+});
+
+test('editing notes preserves the ledger and local replacement can be cancelled',()=>{
+ const ui=setup();ui.run("run();globalThis.before=JSON.stringify(draft);$('#txt').value='Rafi paid 700 for dinner, all split'");
+ for(const h of ui.handlers.input)h({target:{id:'txt',dataset:{}}});
+ assert.equal(ui.run('JSON.stringify(draft)'),ui.run('before'));ui.run("window.confirm=()=>false;run()");assert.equal(ui.run('JSON.stringify(draft)'),ui.run('before'));
+});
+
+test('invalid money and unsupported exclusions stay in local review',()=>{
+ const ui=setup(undefined,false);ui.run("members=['A','B','C'].map(name=>({name}))");
+ for(const note of ['A B ke -500 dibe','A B ke 500 USD dibe','A B ke 1,2 dibe','A paid 600 for dinner, B jai nai']){
+  const result=JSON.parse(ui.run('JSON.stringify(localParse('+JSON.stringify(note)+'))'));
+  assert.equal(result.expenses.length+result.debts.length,0,note);assert(result.unknown.length,note);
+ }
+});
+
+test('malformed backup metadata is rejected before workspace replacement',()=>{
+ const ui=setup();ui.run('run()');const raw=JSON.parse(ui.run('JSON.stringify(draftSnapshot())'));raw.ledger.debts=[{from:'Rafi',to:'Mim',amount:20,note:123}];
+ assert.throws(()=>ui.run('validateSavedDraft('+JSON.stringify(raw)+')'));
+});
+
+test('overlong AI notes are rejected without replacing the current ledger',async()=>{
+ const ui=setup();ui.run("run();globalThis.before=JSON.stringify(draft);$('#txt').value='x'.repeat(8001);window.confirm=()=>true;globalThis.calls=0;callAI=async()=>{calls++}");
+ await ui.run("$('#readChat').onclick()");assert.equal(ui.run('calls'),0);assert.equal(ui.run('JSON.stringify(draft)'),ui.run('before'));
+});
+
+test('cancelling group changes keeps the ledger and names intact',async()=>{
+ const ui=setup();ui.run('run();window.confirm=()=>false');const before=ui.run('JSON.stringify(draft)');
+ ui.run('removeMember(0)');assert.equal(ui.run('members.length'),4);
+ ui.node('#newName').value='Extra';ui.run("$('#addM').onclick()");assert.equal(ui.run('members.length'),4);
+ const target={dataset:{k:'name',i:'0'},value:'Changed',removeAttribute(){}};
+ for(const handler of ui.handlers.input)handler({target});assert.equal(target.value,'Rafi');assert.equal(ui.run('JSON.stringify(draft)'),before);
+});
+
+test('snapshot links round-trip Unicode and reject oversized encoded payloads',()=>{
+ const ui=setup();ui.run("globalThis.payload={version:1,currency:'BDT',createdAt:new Date().toISOString(),transfers:[{from:'সামিন',to:'ইফতি',amt:100000000}]}");
+ assert.equal(ui.run("decodePlan('#sm='+encodePlan(payload)).transfers[0].from"),'সামিন');
+ ui.run("payload.transfers=Array.from({length:29},(_,i)=>({from:'স'.repeat(59)+i%10,to:'ই'.repeat(60),amt:1}))");
+ assert.throws(()=>ui.run('encodePlan(payload)'),/too large/);
+});

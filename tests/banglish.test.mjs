@@ -74,3 +74,14 @@ test('an omitted Banglish subject carries over instead of someone paying their o
  const kept=applyBanglishRules({expenses:[{payer:'samin',amount:700,description:'wifi',participants:['ifty']}],debts:[]},rules.slice(1,2),[]);
  assert.equal(kept.ledger.expenses[0].payer,'samin','a different named payer from the AI is kept');
 });
+
+test('Banglish checks reject negatives, foreign currency and malformed comma amounts',()=>{
+ for(const text of ['iftee samin ke -500 dibe','iftee samin ke 500 USD dibe','iftee samin ke 1,2 dibe','iftee samin ke ০.০০ dibe'])
+  assert.deepEqual(banglishRules(text,members),[],text);
+});
+
+test('a Banglish correction cannot replace an unrelated same-price AI debt',()=>{
+ const ledger={expenses:[],debts:[{from:'omor',to:'ifty',amount:50}]};
+ const result=applyBanglishRules(ledger,banglishRules('iftee samin theke 50 pay',members),[]);
+ assert.deepEqual(result.ledger,ledger);assert.equal(result.fixes,0);
+});

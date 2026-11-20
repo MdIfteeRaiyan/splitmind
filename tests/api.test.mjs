@@ -6,3 +6,9 @@ test('retired cloud parsing never calls or charges a provider',async()=>{const o
 test('server calculations need no access code and preserve exact custom shares',async()=>{const r=await worker.fetch(req('/api/plan',{members,ledger}),{});assert.equal(r.status,200);assert.equal((await r.json()).result.tx[0].amt,400)});
 test('free server validates precision, duplicates, origins and body limits',async()=>{for(const [payload,headers,status] of [[{members:['Rafi','Rafi'],ledger},{},400],[{members,ledger},{Origin:'https://evil.test'},403],[{members,ledger:{...ledger,expenses:[{...ledger.expenses[0],amount:0.001}]}},{},400],[{text:'a'.repeat(45000)},{},413]]){const r=await worker.fetch(req('/api/plan',payload,headers),{});assert.equal(r.status,status)}});
 test('pages and retired payment routes retain expected statuses',async()=>{assert.equal((await worker.fetch(new Request('https://splitmind.test/'),{})).status,200);for(const route of ['/api/orders','/api/capture'])assert.equal((await worker.fetch(req(route,{}),{})).status,404)});
+
+test('malformed JSON shapes return a client error instead of an internal failure',async()=>{
+ for(const payload of [null,[],{members,ledger:{expenses:[null],debts:[]}},{members,ledger:{expenses:[],debts:[null]}}]){
+  const r=await worker.fetch(req('/api/plan',payload),{});assert.equal(r.status,400);
+ }
+});
